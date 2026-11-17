@@ -13,7 +13,7 @@ import math
 from pathlib import Path
 
 OUT = Path(__file__).resolve().parent
-W, H = 1728, 2304  # 18 x 24 in a 96 dpi
+W = 1728  # 18 in de ancho a 96 dpi; el alto se ajusta al contenido
 
 # ---------------------------------------------------------------- geometría
 COLS_SIDE = 12
@@ -123,12 +123,11 @@ y = 0
 add('<defs><pattern id="hatch" width="5" height="5" patternUnits="userSpaceOnUse" '
     'patternTransform="rotate(45)"><rect width="5" height="5" fill="#D6D6D6"/>'
     '<line x1="0" y1="0" x2="0" y2="5" stroke="#B0B0B0" stroke-width="2"/></pattern></defs>')
-add(f'<rect width="{W}" height="{H}" fill="#FFFFFF"/>')
+add('<rect width="100%" height="100%" fill="#FFFFFF"/>')
 
 # título + escenario
 text(W / 2, 78, "MAPA DE LOCALIDADES", 40, "#222", 800, extra='letter-spacing="1"')
-text(W / 2, 112, "ULTRA y VIP: 30% de mesas reservadas · mesas disponibles para 10 personas, "
-     "sillas numeradas 1–10", 17, "#555")
+text(W / 2, 112, "ULTRA y VIP: cada mesa numerada es para 10 personas", 17, "#555")
 add(f'<rect x="{W/2-200}" y="138" width="400" height="86" rx="10" fill="#2B2B2B"/>')
 text(W / 2, 192, "ESCENARIO", 30, "#fff", 800, extra='letter-spacing="6"')
 
@@ -141,9 +140,6 @@ for b in BLOCKS:
     add(f'<rect x="{bx:.1f}" y="{y}" width="{BLOCK_W + 52:.1f}" height="{bh}" rx="10" '
         f'fill="{b["c_bg"]}" stroke="{b["c_main"]}" stroke-width="2"/>')
     text(W / 2, y + 36, f'{b["key"]} · {b["price"]}', 26, b["c_dark"], 800)
-    avail = b["total"] - len(b["reserved"])
-    text(bx + BLOCK_W + 40, y + 34, f'{avail} mesas disponibles · {len(b["reserved"])} reservadas',
-         14, b["c_dark"], 600, anchor="end")
     block_boxes[b["key"]] = (y, bh)
     num = 0
     for r, cols in enumerate(b["layout"]):
@@ -190,51 +186,16 @@ y += 140
 add(f'<rect x="{bx:.1f}" y="{y}" width="{bw:.1f}" height="170" rx="10" fill="#B8741A"/>')
 text(W / 2, y + 80, "GENERAL", 36, "#fff", 800)
 text(W / 2, y + 120, "Q220", 24, "#fff", 500)
-y += 200
-
-# leyenda + resumen
-ly = y + 10
-text(bx, ly, "LEYENDA", 18, "#222", 800, anchor="start")
-lb = BLOCKS[0]
-draw_table(bx + 40, ly + 60, lb, 7)
-text(bx + 75, ly + 48, "Mesa disponible (número de mesa al centro)", 15, "#333", 600, anchor="start")
-text(bx + 75, ly + 70, "10 sillas: 1–5 lado izquierdo, 6–10 lado derecho", 15, "#555", anchor="start")
-text(bx + 75, ly + 90, "(contando desde el escenario hacia atrás)", 15, "#555", anchor="start")
-draw_reserved(bx + 40, ly + 150)
-text(bx + 75, ly + 146, "Mesa RESERVADA (bloqueada, no a la venta)", 15, "#333", 600, anchor="start")
-text(bx + 75, ly + 168, "Código de boleto: LOCALIDAD-Mmesa-Ssilla  ·  ej. ULTRA-M007-S03", 15, "#555",
-     anchor="start")
-
-tx = bx + bw - 600
-text(tx, ly, "RESUMEN ULTRA / VIP", 18, "#222", 800, anchor="start")
-hdr = ["Localidad", "Mesas", "Reservadas", "Disponibles", "Sillas a la venta"]
-xs = [tx, tx + 160, tx + 240, tx + 350, tx + 465]
-for xi, h in zip(xs, hdr):
-    text(xi, ly + 36, h, 14, "#666", 700, anchor="start")
-add(f'<line x1="{tx}" y1="{ly+46}" x2="{tx+600}" y2="{ly+46}" stroke="#CCC"/>')
-tot = [0, 0, 0, 0]
-for i, b in enumerate(BLOCKS):
-    vals = [b["total"], len(b["reserved"]), b["available"], b["available"] * 10]
-    tot = [t + v for t, v in zip(tot, vals)]
-    yy = ly + 72 + i * 28
-    text(xs[0], yy, f'{b["key"]} ({b["price"]})', 15, b["c_dark"], 800, anchor="start")
-    for xi, v in zip(xs[1:], vals):
-        text(xi, yy, f"{v:,}", 15, "#222", 500, anchor="start")
-yy = ly + 72 + 2 * 28 + 4
-add(f'<line x1="{tx}" y1="{yy-20}" x2="{tx+600}" y2="{yy-20}" stroke="#CCC"/>')
-text(xs[0], yy, "Total", 15, "#222", 800, anchor="start")
-for xi, v in zip(xs[1:], tot):
-    text(xi, yy, f"{v:,}", 15, "#222", 800, anchor="start")
-text(tx, yy + 32, "Reservado = 30% de las mesas de cada bloque (redondeado).", 13, "#777",
-     anchor="start")
+y += 170
+H = int(y + 50)  # alto de página ajustado al contenido
 
 svg_doc = (f'<svg xmlns="http://www.w3.org/2000/svg" width="{W}" height="{H}" '
            f'viewBox="0 0 {W} {H}" font-family="{FONT}">' + "\n".join(svg) + "</svg>")
 (OUT / "mapa_localidades.svg").write_text(svg_doc, encoding="utf-8")
 (OUT / "mapa_localidades.html").write_text(
     "<!doctype html><html lang='es'><head><meta charset='utf-8'><title>Mapa de localidades</title>"
-    "<style>@page{size:18in 24in;margin:0}html,body{margin:0;background:#fff}"
-    "svg{display:block;width:18in;height:24in}</style></head><body>" + svg_doc + "</body></html>",
+    f"<style>@page{{size:{W}px {H}px;margin:0}}html,body{{margin:0;background:#fff}}"
+    f"svg{{display:block;width:{W}px;height:{H}px}}</style></head><body>" + svg_doc + "</body></html>",
     encoding="utf-8")
 
 # inventario
