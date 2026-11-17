@@ -43,32 +43,33 @@ def ultra_layout():
 
 
 def vip_layout():
-    # fila 1: 11 + FOH + 11 ; filas 2-9: 24 => 214
-    first = list(range(11)) + list(range(13, 24))
-    return [first] + [list(range(24)) for _ in range(8)]
+    # 150 mesas, 11 por lado (columnas 1-22, centradas en el bloque)
+    # fila 1: 9 + FOH + 9 ; filas 2-7: 22 => 18 + 6*22 = 150
+    first = list(range(1, 10)) + list(range(14, 23))
+    return [first] + [list(range(1, 23)) for _ in range(6)]
 
 
-def reserved_set(layout, rows_full, extra_row, extra_per_side):
+def reserved_set(layout, rows_full, extra_row, extra_left, extra_right):
     """Bloquea las primeras filas completas + las mesas junto al pasillo
     central en la fila siguiente."""
     res = set()
     for r in range(rows_full):
         for c in layout[r]:
             res.add((r, c))
-    if extra_per_side:
+    if extra_left or extra_right:
         cols = layout[extra_row]
-        left = [c for c in cols if c < COLS_SIDE][-extra_per_side:]
-        right = [c for c in cols if c >= COLS_SIDE][:extra_per_side]
+        left = [c for c in cols if c < COLS_SIDE][-extra_left:] if extra_left else []
+        right = [c for c in cols if c >= COLS_SIDE][:extra_right]
         res.update((extra_row, c) for c in left + right)
     return res
 
 
 BLOCKS = [
     dict(key="ULTRA", price="Q1,210", layout=ultra_layout(),
-         reserve=dict(rows_full=1, extra_row=1, extra_per_side=6),
+         reserve=dict(rows_full=1, extra_row=1, extra_left=6, extra_right=6),
          c_main="#D9542B", c_dark="#9A3412", c_bg="#FBEDE6", c_chair="#F4B79C"),
     dict(key="VIP", price="Q770", layout=vip_layout(),
-         reserve=dict(rows_full=2, extra_row=2, extra_per_side=9),
+         reserve=dict(rows_full=2, extra_row=2, extra_left=3, extra_right=2),
          c_main="#5B4FCF", c_dark="#3B2F9A", c_bg="#EEEDFB", c_chair="#C3BDF3"),
 ]
 
@@ -158,8 +159,8 @@ for b in BLOCKS:
                     rows_csv.append([b["key"], b["price"], num, s,
                                      f'{b["key"]}-M{num:03d}-S{s:02d}', "Disponible"])
         if b["key"] == "VIP" and r == 0:
-            fx = col_x(11) - 22
-            fw = col_x(12) + 22 - fx
+            fx = col_x(10) - 22
+            fw = col_x(13) + 22 - fx
             add(f'<rect x="{fx:.1f}" y="{cy-31:.1f}" width="{fw:.1f}" height="62" rx="6" '
                 f'fill="#F1EFEA" stroke="#9A9A9A" stroke-width="1.2"/>')
             text(fx + fw / 2, cy + 6, "FOH", 16, "#555", 700)
