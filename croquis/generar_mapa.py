@@ -44,9 +44,12 @@ def ultra_layout():
 
 def vip_layout():
     # 150 mesas, 11 por lado (columnas 1-22, centradas en el bloque)
-    # fila 1: 9 + FOH + 9 ; filas 2-7: 22 => 18 + 6*22 = 150
-    first = list(range(1, 10)) + list(range(14, 23))
-    return [first] + [list(range(1, 23)) for _ in range(6)]
+    # fila 1: 10 + FOH + 10 (el FOH ocupa una mesa de cada sección)
+    # filas 2-6: 22 ; fila 7: 10 + 10 (sin las mesas de las esquinas)
+    # => 20 + 5*22 + 20 = 150
+    first = list(range(1, 11)) + list(range(13, 23))
+    last = list(range(2, 12)) + list(range(12, 22))
+    return [first] + [list(range(1, 23)) for _ in range(5)] + [last]
 
 
 def reserved_set(layout, rows_full, extra_row, extra_left, extra_right):
@@ -69,7 +72,7 @@ BLOCKS = [
          reserve=dict(rows_full=1, extra_row=1, extra_left=6, extra_right=6),
          c_main="#D9542B", c_dark="#9A3412", c_bg="#FBEDE6", c_chair="#F4B79C"),
     dict(key="VIP", price="Q770", layout=vip_layout(),
-         reserve=dict(rows_full=2, extra_row=2, extra_left=3, extra_right=2),
+         reserve=dict(rows_full=2, extra_row=2, extra_left=2, extra_right=1),
          c_main="#5B4FCF", c_dark="#3B2F9A", c_bg="#EEEDFB", c_chair="#C3BDF3"),
 ]
 
@@ -105,7 +108,7 @@ def draw_table(cx, cy, b, num):
     text(cx, cy + 3, num, 8.5 if num < 100 else 7.4, "#fff", 800)
 
 
-def draw_reserved(cx, cy):
+def draw_reserved(cx, cy, num):
     x, y = cx - TABLE_W / 2, cy - TABLE_H / 2
     for side in (-1, 1):
         for dy in CHAIR_DY:
@@ -113,8 +116,10 @@ def draw_reserved(cx, cy):
                 f'fill="#EEEEEE" stroke="#BDBDBD" stroke-width="0.6" stroke-dasharray="1.5 1.2"/>')
     add(f'<rect x="{x:.1f}" y="{y:.1f}" width="{TABLE_W}" height="{TABLE_H}" rx="3" '
         f'fill="url(#hatch)" stroke="#6B6B6B" stroke-width="0.8"/>')
-    text(cx + 2.4, cy, "RESERVADA", 6.6, "#333", 800,
-         extra=f'transform="rotate(-90 {cx + 2.4:.1f} {cy:.1f})" letter-spacing="0.3"')
+    text(cx, cy - 20, num, 8 if num < 100 else 7, "#222", 800)
+    ty = cy + 8
+    text(cx + 2.2, ty, "RESERVADA", 5.8, "#333", 800,
+         extra=f'transform="rotate(-90 {cx + 2.2:.1f} {ty:.1f})" letter-spacing="0.2"')
 
 
 rows_csv = []
@@ -146,21 +151,23 @@ for b in BLOCKS:
         cy = y + 66 + r * ROW_PITCH + ROW_PITCH / 2 - 6
         for c in cols:
             cx = col_x(c)
-            if (r, c) in b["reserved"]:
-                draw_reserved(cx, cy)
+            num += 1
+            reserved = (r, c) in b["reserved"]
+            if reserved:
+                draw_reserved(cx, cy, num)
             else:
-                num += 1
                 draw_table(cx, cy, b, num)
-                for s in range(1, 11):
-                    rows_csv.append([b["key"], b["price"], num, s,
-                                     f'{b["key"]}-M{num:03d}-S{s:02d}', "Disponible"])
+            for s in range(1, 11):
+                rows_csv.append([b["key"], b["price"], num, s,
+                                 f'{b["key"]}-M{num:03d}-S{s:02d}',
+                                 "Reservada" if reserved else "Disponible"])
         if b["key"] == "VIP" and r == 0:
-            fx = col_x(10) - 22
-            fw = col_x(13) + 22 - fx
+            fx = col_x(11) - 22
+            fw = col_x(12) + 22 - fx
             add(f'<rect x="{fx:.1f}" y="{cy-31:.1f}" width="{fw:.1f}" height="62" rx="6" '
                 f'fill="#F1EFEA" stroke="#9A9A9A" stroke-width="1.2"/>')
             text(fx + fw / 2, cy + 6, "FOH", 16, "#555", 700)
-    b["available"] = num
+    b["available"] = num - len(b["reserved"])
     y += bh + 20
 
 # laterales (sin cambios)
