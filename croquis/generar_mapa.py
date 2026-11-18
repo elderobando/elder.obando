@@ -122,6 +122,7 @@ def draw_reserved(cx, cy, num):
          extra=f'transform="rotate(-90 {cx + 2.2:.1f} {ty:.1f})" letter-spacing="0.2"')
 
 
+SHOW_RESERVED = False  # True = versión v1 (mesas reservadas visibles)
 rows_csv = []
 y = 0
 
@@ -154,13 +155,18 @@ for b in BLOCKS:
             num += 1
             reserved = (r, c) in b["reserved"]
             if reserved:
-                draw_reserved(cx, cy, num)
-            else:
-                draw_table(cx, cy, b, num)
+                # v2: las mesas reservadas se eliminan del mapa; el resto
+                # conserva su lugar y su número
+                if SHOW_RESERVED:
+                    draw_reserved(cx, cy, num)
+                    for s in range(1, 11):
+                        rows_csv.append([b["key"], b["price"], num, s,
+                                         f'{b["key"]}-M{num:03d}-S{s:02d}', "Reservada"])
+                continue
+            draw_table(cx, cy, b, num)
             for s in range(1, 11):
                 rows_csv.append([b["key"], b["price"], num, s,
-                                 f'{b["key"]}-M{num:03d}-S{s:02d}',
-                                 "Reservada" if reserved else "Disponible"])
+                                 f'{b["key"]}-M{num:03d}-S{s:02d}', "Disponible"])
         if b["key"] == "VIP" and r == 0:
             fx = col_x(11) - 22
             fw = col_x(12) + 22 - fx
@@ -175,7 +181,7 @@ vip_y, vip_h = block_boxes["VIP"]
 side_h, side_w = 420, 104
 side_y = vip_y + vip_h / 2 - side_h / 2
 for sx, label, price, color in [
-        (X0 - 26 - 50 - side_w, "PREFERENCIA NORTE", "Q440 · Aforo: 500 personas", "#1E9E73"),
+        (X0 - 26 - 50 - side_w, "PREFERENCIA NORTE", "Q440", "#1E9E73"),
         (X0 + BLOCK_W + 26 + 50, "GENERAL GRADERÍO", "Q220", "#B8741A")]:
     add(f'<rect x="{sx:.1f}" y="{side_y:.1f}" width="{side_w}" height="{side_h}" rx="10" fill="{color}"/>')
     ccx, ccy = sx + side_w / 2, side_y + side_h / 2
@@ -188,11 +194,11 @@ for sx, label, price, color in [
 bx, bw = X0 - 26, BLOCK_W + 52
 add(f'<rect x="{bx:.1f}" y="{y}" width="{bw:.1f}" height="120" rx="10" fill="#1E9E73"/>')
 text(W / 2, y + 56, "PREFERENCIA", 32, "#fff", 800)
-text(W / 2, y + 92, "Q440 · Aforo: 1,000 personas", 22, "#fff", 500)
+text(W / 2, y + 92, "Q440", 22, "#fff", 500)
 y += 140
 add(f'<rect x="{bx:.1f}" y="{y}" width="{bw:.1f}" height="170" rx="10" fill="#B8741A"/>')
 text(W / 2, y + 80, "GENERAL", 36, "#fff", 800)
-text(W / 2, y + 120, "Q220 · Aforo: 2,100 personas", 24, "#fff", 500)
+text(W / 2, y + 120, "Q220", 24, "#fff", 500)
 y += 170
 H = int(y + 50)  # alto de página ajustado al contenido
 
