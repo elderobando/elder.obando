@@ -5223,13 +5223,13 @@
 <text x="1359.0" y="1367.0" font-size="7.4" fill="#fff" font-weight="800" text-anchor="middle" >150</text>
 <rect x="67.0" y="875.0" width="104" height="420" rx="10" fill="#1E9E73"/>
 <text x="109.0" y="1085.0" font-size="22" fill="#fff" font-weight="800" text-anchor="middle" transform="rotate(-90 109.0 1085.0)" letter-spacing="1">PREFERENCIA NORTE</text>
-<text x="141.0" y="1085.0" font-size="19" fill="#fff" font-weight="500" text-anchor="middle" transform="rotate(-90 141.0 1085.0)">Q440</text>
+<text x="141.0" y="1085.0" font-size="17" fill="#fff" font-weight="500" text-anchor="middle" transform="rotate(-90 141.0 1085.0)">Q440 · Aforo: 500 personas</text>
 <rect x="1557.0" y="875.0" width="104" height="420" rx="10" fill="#B8741A"/>
 <text x="1599.0" y="1085.0" font-size="22" fill="#fff" font-weight="800" text-anchor="middle" transform="rotate(-90 1599.0 1085.0)" letter-spacing="1">GENERAL GRADERÍO</text>
 <text x="1631.0" y="1085.0" font-size="19" fill="#fff" font-weight="500" text-anchor="middle" transform="rotate(-90 1631.0 1085.0)">Q220</text>
 <rect x="221.0" y="1432" width="1286.0" height="120" rx="10" fill="#1E9E73"/>
 <text x="864.0" y="1488.0" font-size="32" fill="#fff" font-weight="800" text-anchor="middle" >PREFERENCIA</text>
-<text x="864.0" y="1524.0" font-size="22" fill="#fff" font-weight="500" text-anchor="middle" >Q440</text>
+<text x="864.0" y="1524.0" font-size="22" fill="#fff" font-weight="500" text-anchor="middle" >Q440 · Aforo: 1,000 personas</text>
 <rect x="221.0" y="1572" width="1286.0" height="170" rx="10" fill="#B8741A"/>
 <text x="864.0" y="1652.0" font-size="36" fill="#fff" font-weight="800" text-anchor="middle" >GENERAL</text>
 <text x="864.0" y="1692.0" font-size="24" fill="#fff" font-weight="500" text-anchor="middle" >Q220</text></svg>
