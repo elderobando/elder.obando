@@ -192,7 +192,7 @@ text(W / 2, y + 92, "Q440 · Aforo: 1,000 personas", 22, "#fff", 500)
 y += 140
 add(f'<rect x="{bx:.1f}" y="{y}" width="{bw:.1f}" height="170" rx="10" fill="#B8741A"/>')
 text(W / 2, y + 80, "GENERAL", 36, "#fff", 800)
-text(W / 2, y + 120, "Q220 · Aforo: 2,000 personas", 24, "#fff", 500)
+text(W / 2, y + 120, "Q220 · Aforo: 2,100 personas", 24, "#fff", 500)
 y += 170
 H = int(y + 50)  # alto de página ajustado al contenido
 
